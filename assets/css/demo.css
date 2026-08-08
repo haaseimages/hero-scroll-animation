@@ -245,11 +245,23 @@ body {
   margin-bottom: 1.5rem;
 }
 
-.demo-content p:last-child {
+.demo-content p:not(.demo-kicker):not(.demo-version) {
   color: var(--text-secondary);
   font-size: clamp(1rem, 1.8vw, 1.3rem);
   line-height: 1.6;
   max-width: 60ch;
+}
+
+.demo-content p.demo-version {
+  border: 1px solid var(--color-dark-20);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  margin-top: 28px;
+  padding: 8px 12px;
 }
 
 @media screen and (max-width: 849.98px) {
