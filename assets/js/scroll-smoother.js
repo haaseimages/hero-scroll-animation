@@ -37,6 +37,10 @@
       return;
     }
 
+    if (hasTouchInput()) {
+      return;
+    }
+
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return;
     }
@@ -48,16 +52,14 @@
     }
 
     const gsap = window.gsap;
-    const isTouchInput = hasTouchInput();
-    const touchSmoothing = isTouchInput ? 0.05 : 0;
     gsap.registerPlugin(window.ScrollTrigger, window.ScrollSmoother);
 
     window.haaseScrollSmoother = window.ScrollSmoother.create({
       wrapper: '#smooth-wrapper',
       content: '#smooth-content',
       smooth: 0.6,
-      smoothTouch: touchSmoothing,
-      normalizeScroll: isTouchInput,
+      smoothTouch: 0,
+      normalizeScroll: false,
       ignoreMobileResize: true,
       effects: false,
     });
