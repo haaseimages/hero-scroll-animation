@@ -59,7 +59,7 @@ body {
 
 .demo-header {
   align-items: center;
-  background: var(--color-light-50);
+  background: var(--surface);
   border-bottom: 1px solid var(--color-dark-8);
   box-shadow: 0 3px 16px var(--color-dark-8);
   display: flex;
@@ -142,18 +142,12 @@ body {
 
 .hero[data-hero-scroll] {
   background-color: var(--section-bg);
+  min-height: calc(80svh - var(--header-height));
   z-index: 0;
 }
 
 .hero-scroll-stage {
   position: relative;
-}
-
-.hero-scroll-stage > .demo-content {
-  left: 0;
-  position: absolute;
-  width: 100%;
-  z-index: 40;
 }
 
 .hero-scroll-stage > [data-hero-scroll] + .section--light,
@@ -166,6 +160,7 @@ body {
   background-color: var(--section-bg);
   grid-column: 1 / -1;
   grid-row: 1;
+  height: calc(100svh - var(--header-height));
   overflow: hidden;
   position: sticky;
   top: var(--header-height);
