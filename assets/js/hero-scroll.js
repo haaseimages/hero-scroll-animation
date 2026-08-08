@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const images = Array.from(section.querySelectorAll(".hero-scroll__image"));
   const header = document.querySelector("[data-header]");
   const media = section.querySelector(".hero-scroll__media");
-  const mediaInner = section.querySelector(".hero-scroll__media-inner");
   const nextSection = section.nextElementSibling;
   const stage = section.closest("[data-hero-scroll-stage]");
   if (titles.length < 2 || images.length !== titles.length) return;
@@ -15,7 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let observer = null;
   let followSectionHold = null;
   let backgroundPin = null;
-  let parallaxTween = null;
   let layoutMetrics = null;
   let layoutWidth = 0;
 
@@ -100,7 +98,6 @@ document.addEventListener("DOMContentLoaded", function () {
   prepareImage(1);
   createObserver();
 
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const gsap = window.gsap;
   const ScrollTrigger = window.ScrollTrigger;
 
@@ -123,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return layoutMetrics.heroHeight;
   }
 
-  if (gsap && ScrollTrigger && media && mediaInner && nextSection && stage) {
+  if (gsap && ScrollTrigger && media && nextSection && stage) {
     gsap.registerPlugin(ScrollTrigger);
     applyLayoutMetrics();
 
@@ -165,28 +162,6 @@ document.addEventListener("DOMContentLoaded", function () {
       refreshPriority: 1
     });
 
-    if (!prefersReducedMotion) {
-      parallaxTween = gsap.fromTo(
-        mediaInner,
-        { yPercent: 5 },
-        {
-          yPercent: -5,
-          ease: "none",
-          scrollTrigger: {
-            trigger: stage,
-            start: function () {
-              return followSectionHold.end;
-            },
-            end: function () {
-              return backgroundPin.end;
-            },
-            scrub: 0.35,
-            invalidateOnRefresh: true,
-            refreshPriority: 0
-          }
-        }
-      );
-    }
   }
 
   const breakpoint = window.matchMedia("(max-width: 849.98px)");
@@ -228,12 +203,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.classList.remove("has-hero-background-pin");
     window.removeEventListener("resize", handleResize);
     if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
-
-    if (parallaxTween && parallaxTween.scrollTrigger) {
-      parallaxTween.scrollTrigger.kill();
-    }
-
-    if (parallaxTween) parallaxTween.kill();
 
     if (typeof breakpoint.removeEventListener === "function") {
       breakpoint.removeEventListener("change", handleBreakpointChange);
