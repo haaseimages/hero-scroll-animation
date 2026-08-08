@@ -48,7 +48,8 @@
     }
 
     const gsap = window.gsap;
-    const touchSmoothing = hasTouchInput() ? 0.1 : 0;
+    const isTouchInput = hasTouchInput();
+    const touchSmoothing = isTouchInput ? 0.05 : 0;
     gsap.registerPlugin(window.ScrollTrigger, window.ScrollSmoother);
 
     window.haaseScrollSmoother = window.ScrollSmoother.create({
@@ -56,7 +57,7 @@
       content: '#smooth-content',
       smooth: 0.6,
       smoothTouch: touchSmoothing,
-      normalizeScroll: false,
+      normalizeScroll: isTouchInput,
       ignoreMobileResize: true,
       effects: false,
     });
