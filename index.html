@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Isolierte Testversion der Skin Art Cosmetics Hero-Scroll-Animation">
+    <title>Skin Art Cosmetics – Hero Scroll Test</title>
+    <link rel="stylesheet" href="assets/css/demo.css">
+  </head>
+  <body>
+    <header class="demo-header" data-header>
+      <a class="demo-header__brand" href="#" aria-label="Zur Hero-Animation">Skin Art Cosmetics</a>
+      <nav class="demo-header__nav" aria-label="Pseudo-Navigation">
+        <a href="">Behandlungen</a>
+        <a class="demo-header__button" href="">Kontakt</a>
+      </nav>
+    </header>
+
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        <main class="skinart-page skinart-home">
+          <div class="hero-scroll-stage" data-hero-scroll-stage>
+            <section class="page-grid section section--light hero hero--fullscreen" data-hero-scroll aria-labelledby="home-hero-title">
+              <div class="hero-scroll__media" aria-hidden="true">
+                <picture>
+                  <source media="(max-width: 599.98px)" srcset="assets/img/hero/hero-skinart-brand-mobile.webp">
+                  <img class="hero-scroll__image is-active" src="assets/img/hero/hero-skinart-brand-desktop.webp" alt="" width="1920" height="1080" loading="eager" fetchpriority="high">
+                </picture>
+                <picture>
+                  <source media="(max-width: 599.98px)" srcset="assets/img/hero/hero-skinart-anti-aging-treatment-mobile.webp">
+                  <img class="hero-scroll__image" src="assets/img/hero/hero-skinart-anti-aging-treatment-desktop.webp" alt="" width="1920" height="1080" loading="lazy">
+                </picture>
+                <picture>
+                  <source media="(max-width: 599.98px)" srcset="assets/img/hero/hero-skinart-microneedling-mobile.webp">
+                  <img class="hero-scroll__image" src="assets/img/hero/hero-skinart-microneedling-desktop.webp" alt="" width="1920" height="1080" loading="lazy">
+                </picture>
+                <picture>
+                  <source media="(max-width: 599.98px)" srcset="assets/img/hero/hero-skinart-jet-peel-mobile.webp">
+                  <img class="hero-scroll__image" src="assets/img/hero/hero-skinart-jet-peel-desktop.webp" alt="" width="1920" height="1080" loading="lazy">
+                </picture>
+                <picture>
+                  <source media="(max-width: 599.98px)" srcset="assets/img/hero/hero-skinart-permanent-make-up-mobile.webp">
+                  <img class="hero-scroll__image" src="assets/img/hero/hero-skinart-permanent-make-up-desktop.webp" alt="" width="1920" height="1080" loading="lazy">
+                </picture>
+                <picture>
+                  <source media="(max-width: 599.98px)" srcset="assets/img/hero/hero-skinart-futura-contour-mobile.webp">
+                  <img class="hero-scroll__image" src="assets/img/hero/hero-skinart-futura-contour-desktop.webp" alt="" width="1920" height="1080" loading="lazy">
+                </picture>
+                <picture>
+                  <source media="(max-width: 599.98px)" srcset="assets/img/hero/hero-skinart-lash-and-brow-lifting-mobile.webp">
+                  <img class="hero-scroll__image" src="assets/img/hero/hero-skinart-lash-and-brow-lifting-desktop.webp" alt="" width="1920" height="1080" loading="lazy">
+                </picture>
+                <picture>
+                  <source media="(max-width: 599.98px)" srcset="assets/img/hero/hero-skinart-hollywood-dermaplaning-mobile.webp">
+                  <img class="hero-scroll__image" src="assets/img/hero/hero-skinart-hollywood-dermaplaning-desktop.webp" alt="" width="1920" height="1080" loading="lazy">
+                </picture>
+              </div>
+
+              <div class="main-wide hero__content hero-scroll__content">
+                <div class="hero-scroll__title-viewport">
+                  <div class="hero-scroll__list">
+                    <p id="home-hero-title" class="hero-heading hero-scroll__title is-active">SKIN ART COSMETICS</p>
+                    <p class="hero-heading hero-scroll__title">ANTI AGING TREATMENT</p>
+                    <p class="hero-heading hero-scroll__title">MICRONEEDLING</p>
+                    <p class="hero-heading hero-scroll__title">JET PEEL</p>
+                    <p class="hero-heading hero-scroll__title">PERMANENT MAKE-UP</p>
+                    <p class="hero-heading hero-scroll__title">FUTURA CONTOUR</p>
+                    <p class="hero-heading hero-scroll__title">LASH AND BROW LIFTING</p>
+                    <p class="hero-heading hero-scroll__title">HOLLYWOOD DERMAPLANING</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="section section--light demo-content" aria-labelledby="after-hero-title">
+              <div>
+                <p class="demo-kicker">Isolierter Testbereich</p>
+                <h1 id="after-hero-title">Die Hero-Sequenz ist abgeschlossen.</h1>
+                <p>Dieser Bereich bestätigt, dass das Pinning endet und die Seite anschließend normal weiterscrollt.</p>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/vendor/gsap.min.js"></script>
+    <script src="assets/js/vendor/ScrollTrigger.min.js"></script>
+    <script src="assets/js/vendor/ScrollSmoother.js"></script>
+    <script src="assets/js/scroll-smoother.js"></script>
+    <script src="assets/js/hero-scroll.js"></script>
+  </body>
+</html>
