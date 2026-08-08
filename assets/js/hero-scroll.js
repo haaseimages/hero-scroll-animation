@@ -1,72 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
-  if (typeof window.gsap === "undefined" || typeof window.ScrollTrigger === "undefined") {
-    return;
-  }
-
-  const gsap = window.gsap;
-  const ScrollTrigger = window.ScrollTrigger;
-
-  gsap.registerPlugin(ScrollTrigger);
-
   const section = document.querySelector("[data-hero-scroll]");
-  const stage = document.querySelector("[data-hero-scroll-stage]");
-  if (!section || !stage) return;
+  if (!section) return;
 
+  const titles = Array.from(section.querySelectorAll(".hero-scroll__title"));
+  const images = Array.from(section.querySelectorAll(".hero-scroll__image"));
   const header = document.querySelector("[data-header]");
-  const list = section.querySelector(".hero-scroll__list");
-  const titles = gsap.utils.toArray(section.querySelectorAll(".hero-scroll__title"));
-  const images = gsap.utils.toArray(section.querySelectorAll(".hero-scroll__image"));
-  const pinSpacerClass = "hero-scroll-pin-spacer";
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const hasTouchInput =
-    ("ontouchstart" in window) ||
-    navigator.maxTouchPoints > 0 ||
-    window.matchMedia("(pointer: coarse)").matches;
-  const useImageParallax = !prefersReducedMotion && !hasTouchInput;
-  const parallaxDistance = 12;
-  const parallaxScale = 1.0;
-  const parallaxScrub = 0.45;
+  const media = section.querySelector(".hero-scroll__media");
+  const mediaInner = section.querySelector(".hero-scroll__media-inner");
+  const nextSection = section.nextElementSibling;
+  if (titles.length < 2 || images.length !== titles.length) return;
 
-  if (!list || titles.length < 2 || images.length !== titles.length) return;
-
-  const items = titles.map((title, index) => ({
-    title,
-    image: images[index]
-  }));
-
-  // The first image is already active in the HTML/CSS. Preserve that initial
-  // render so the LCP image does not depend on GSAP initialization.
   let currentIndex = 0;
-  let headerResizeObserver = null;
-  let titleOffsets = [];
-  let travelDistance = 0;
-  let animationDistance = 1;
-  let scrollDistance = 1;
-
-  if (hasTouchInput) {
-    ScrollTrigger.config({ ignoreMobileResize: true });
-  }
-
-  function getHeaderHeight() {
-    return header ? header.getBoundingClientRect().height : 0;
-  }
-
-  function getEndBuffer() {
-    return window.innerHeight * 0.3;
-  }
-
-  function measureLayout() {
-    const firstOffset = titles[0].offsetTop;
-
-    titleOffsets = titles.map((title) => title.offsetTop - firstOffset);
-    travelDistance = Math.max(0, titleOffsets[titleOffsets.length - 1]);
-    animationDistance = Math.max(travelDistance, 1);
-    scrollDistance = animationDistance + getEndBuffer();
-  }
-
-  function getParallaxLeadIn() {
-    return Math.min(100, Math.max(48, window.innerHeight * 0.08));
-  }
+  let observer = null;
+  let backgroundPin = null;
+  let parallaxTween = null;
 
   function prepareImage(index) {
     const image = images[index];
@@ -76,150 +23,141 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (typeof image.decode === "function") {
       image.decode().catch(function () {
-        // Decoding is only a preparation step. A failed decode must not block
-        // scrolling or the regular browser image loading path.
+        // Preparation is optional. Normal browser loading remains the fallback.
       });
     }
   }
 
   function setActiveItem(index) {
-    if (index === currentIndex || !items[index]) return;
-
-    const previousItem = items[currentIndex];
-    const nextItem = items[index];
+    if (!titles[index] || !images[index]) return;
 
     currentIndex = index;
 
-    titles.forEach((title, titleIndex) => {
-      title.classList.toggle("is-active", titleIndex === index);
+    titles.forEach(function (title, titleIndex) {
+      const isActive = titleIndex === index;
+      title.classList.toggle("is-active", isActive);
+      title.setAttribute("aria-current", isActive ? "true" : "false");
     });
 
-    if (previousItem) {
-      previousItem.image.classList.remove("is-active");
-
-      gsap.to(previousItem.image, {
-        opacity: 0,
-        duration: 0.35,
-        ease: "power1.out",
-        overwrite: "auto"
-      });
-    }
-
-    nextItem.image.classList.add("is-active");
-
-    gsap.to(nextItem.image, {
-      opacity: 1,
-      duration: 0.35,
-      ease: "power1.out",
-      overwrite: "auto"
+    images.forEach(function (image, imageIndex) {
+      image.classList.toggle("is-active", imageIndex === index);
     });
 
     prepareImage(index + 1);
   }
 
-  function getActiveIndexByTravel(currentTravel) {
-    let activeIndex = 0;
+  function getObserverMargin() {
+    return window.matchMedia("(max-width: 849.98px)").matches
+      ? "-25% 0px -65% 0px"
+      : "-45% 0px -45% 0px";
+  }
 
-    titleOffsets.forEach((titleOffset, index) => {
-      if (currentTravel >= titleOffset - 1) {
-        activeIndex = index;
+  function createObserver() {
+    if (observer) observer.disconnect();
+
+    observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+
+          const index = titles.indexOf(entry.target);
+          if (index !== -1 && index !== currentIndex) {
+            setActiveItem(index);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: getObserverMargin(),
+        threshold: 0
       }
+    );
+
+    titles.forEach(function (title) {
+      observer.observe(title);
+    });
+  }
+
+  setActiveItem(0);
+  prepareImage(1);
+  createObserver();
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const gsap = window.gsap;
+  const ScrollTrigger = window.ScrollTrigger;
+
+  function getHeroStart() {
+    const headerHeight = header ? header.getBoundingClientRect().height : 0;
+    return `top top+=${headerHeight}`;
+  }
+
+  function getTransitionEnd() {
+    const headerHeight = header ? header.getBoundingClientRect().height : 0;
+    return `top top+=${headerHeight}`;
+  }
+
+  if (gsap && ScrollTrigger && media && mediaInner && nextSection) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    document.body.classList.add("has-hero-background-pin");
+
+    backgroundPin = ScrollTrigger.create({
+      trigger: section,
+      start: getHeroStart,
+      endTrigger: nextSection,
+      end: getTransitionEnd,
+      pin: media,
+      pinSpacing: false,
+      invalidateOnRefresh: true
     });
 
-    return activeIndex;
-  }
-
-  function setPinSpacerBackground(self) {
-    if (!self || !self.pin || !self.pin.parentElement) return;
-
-    self.pin.parentElement.classList.add(pinSpacerClass);
-  }
-
-  gsap.set(images, {
-    yPercent: 0,
-    scale: useImageParallax ? parallaxScale : 1,
-    transformOrigin: "center center"
-  });
-
-  measureLayout();
-  prepareImage(1);
-
-  const pinTween = gsap.to(list, {
-    y: () => -travelDistance,
-    ease: "none",
-    scrollTrigger: {
-      trigger: stage,
-      start: () => `top top+=${getHeaderHeight()}`,
-      end: () => `+=${scrollDistance}`,
-      scrub: hasTouchInput ? 0.15 : true,
-      pin: stage,
-      pinSpacing: true,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-      markers: false,
-
-      onRefreshInit: measureLayout,
-      onRefresh: setPinSpacerBackground,
-
-      onUpdate: function (self) {
-        const animationProgress = Math.min(
-          self.progress * (scrollDistance / animationDistance),
-          1
-        );
-
-        const currentTravel = animationProgress * travelDistance;
-        const activeIndex = getActiveIndexByTravel(currentTravel);
-
-        setActiveItem(activeIndex);
-      }
-    }
-  });
-
-  const parallaxTween = !useImageParallax
-    ? null
-    : gsap.to(images, {
-        yPercent: parallaxDistance,
-        ease: "power1.inOut",
-        scrollTrigger: {
-          trigger: stage,
-          start: () => pinTween.scrollTrigger.end - getParallaxLeadIn(),
-          end: () => pinTween.scrollTrigger.end + section.offsetHeight,
-          scrub: parallaxScrub,
-          invalidateOnRefresh: true,
-          refreshPriority: -1
+    if (!prefersReducedMotion) {
+      parallaxTween = gsap.fromTo(
+        mediaInner,
+        { yPercent: 5 },
+        {
+          yPercent: -5,
+          ease: "none",
+          scrollTrigger: {
+            trigger: nextSection,
+            start: "top bottom",
+            end: getTransitionEnd,
+            scrub: 0.35,
+            invalidateOnRefresh: true
+          }
         }
-      });
-
-  function refreshScrollTriggers() {
-    ScrollTrigger.refresh();
+      );
+    }
   }
 
-  if (header && typeof window.ResizeObserver !== "undefined") {
-    headerResizeObserver = new ResizeObserver(refreshScrollTriggers);
-    headerResizeObserver.observe(header);
-  }
+  const breakpoint = window.matchMedia("(max-width: 849.98px)");
+  const handleBreakpointChange = function () {
+    createObserver();
+    if (ScrollTrigger) ScrollTrigger.refresh();
+  };
 
-  ScrollTrigger.refresh();
+  if (typeof breakpoint.addEventListener === "function") {
+    breakpoint.addEventListener("change", handleBreakpointChange);
+  } else if (typeof breakpoint.addListener === "function") {
+    breakpoint.addListener(handleBreakpointChange);
+  }
 
   window.addEventListener("beforeunload", function () {
-    if (headerResizeObserver) {
-      headerResizeObserver.disconnect();
-    }
+    if (observer) observer.disconnect();
 
-    if (pinTween && pinTween.scrollTrigger) {
-      pinTween.scrollTrigger.kill();
-    }
-
-    if (pinTween) {
-      pinTween.kill();
-    }
+    if (backgroundPin) backgroundPin.kill();
+    document.body.classList.remove("has-hero-background-pin");
 
     if (parallaxTween && parallaxTween.scrollTrigger) {
       parallaxTween.scrollTrigger.kill();
     }
 
-    if (parallaxTween) {
-      parallaxTween.kill();
+    if (parallaxTween) parallaxTween.kill();
+
+    if (typeof breakpoint.removeEventListener === "function") {
+      breakpoint.removeEventListener("change", handleBreakpointChange);
+    } else if (typeof breakpoint.removeListener === "function") {
+      breakpoint.removeListener(handleBreakpointChange);
     }
   });
 });
