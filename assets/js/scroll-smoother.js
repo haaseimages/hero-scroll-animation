@@ -58,7 +58,7 @@
       wrapper: '#smooth-wrapper',
       content: '#smooth-content',
       smooth: 0.6,
-      smoothTouch: 0,
+      smoothTouch: 0.0,
       normalizeScroll: false,
       ignoreMobileResize: true,
       effects: false,

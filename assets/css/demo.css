@@ -142,12 +142,7 @@ body {
 
 .hero[data-hero-scroll] {
   background-color: var(--section-bg);
-  min-height: calc(80svh - var(--header-height));
-  z-index: 0;
-}
-
-.hero-scroll-stage {
-  position: relative;
+  min-height: calc(100svh - var(--header-height));
 }
 
 .hero-scroll-stage > [data-hero-scroll] + .section--light,
@@ -244,8 +239,6 @@ body {
 }
 
 .demo-content {
-  background-color: #ded5e2;
-  backface-visibility: hidden;
   display: grid;
   min-height: 100svh;
   padding: clamp(32px, 5vw, 72px) max(24px, calc((100vw - 1120px) / 2));
