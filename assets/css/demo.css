@@ -311,6 +311,24 @@ body {
     height: auto;
   }
 
+  .hero[data-hero-scroll] {
+    min-height: calc(100vh - var(--header-height) + 100px);
+  }
+
+  .hero-scroll__media {
+    height: calc(100vh - var(--header-height) + 100px);
+  }
+
+  @supports (height: 100lvh) {
+    .hero[data-hero-scroll] {
+      min-height: calc(100lvh - var(--header-height) + 100px);
+    }
+
+    .hero-scroll__media {
+      height: calc(100lvh - var(--header-height) + 100px);
+    }
+  }
+
   .hero-scroll__media::after {
     background: var(--overlay);
   }
