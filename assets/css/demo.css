@@ -188,12 +188,14 @@ body {
 }
 
 .hero-scroll__list {
+  backface-visibility: hidden;
   display: flex;
   flex-direction: column;
   gap: clamp(4px, 1.2vh, 12px);
   left: 0;
   position: absolute;
   top: calc(50svh - var(--header-height));
+  will-change: transform;
 }
 
 .hero-scroll__title {

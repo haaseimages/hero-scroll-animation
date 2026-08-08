@@ -18,6 +18,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const images = gsap.utils.toArray(section.querySelectorAll(".hero-scroll__image"));
   const pinSpacerClass = "hero-scroll-pin-spacer";
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hasTouchInput =
+    ("ontouchstart" in window) ||
+    navigator.maxTouchPoints > 0 ||
+    window.matchMedia("(pointer: coarse)").matches;
+  const useImageParallax = !prefersReducedMotion && !hasTouchInput;
   const parallaxDistance = 12;
   const parallaxScale = 1.0;
   const parallaxScrub = 0.45;
@@ -33,33 +38,48 @@ document.addEventListener("DOMContentLoaded", function () {
   // render so the LCP image does not depend on GSAP initialization.
   let currentIndex = 0;
   let headerResizeObserver = null;
+  let titleOffsets = [];
+  let travelDistance = 0;
+  let animationDistance = 1;
+  let scrollDistance = 1;
+
+  if (hasTouchInput) {
+    ScrollTrigger.config({ ignoreMobileResize: true });
+  }
 
   function getHeaderHeight() {
     return header ? header.getBoundingClientRect().height : 0;
-  }
-
-  function getTitleOffset(title) {
-    return title.offsetTop - titles[0].offsetTop;
-  }
-
-  function getTravelDistance() {
-    return Math.max(0, getTitleOffset(titles[titles.length - 1]));
-  }
-
-  function getAnimationDistance() {
-    return getTravelDistance();
   }
 
   function getEndBuffer() {
     return window.innerHeight * 0.3;
   }
 
-  function getScrollDistance() {
-    return getAnimationDistance() + getEndBuffer();
+  function measureLayout() {
+    const firstOffset = titles[0].offsetTop;
+
+    titleOffsets = titles.map((title) => title.offsetTop - firstOffset);
+    travelDistance = Math.max(0, titleOffsets[titleOffsets.length - 1]);
+    animationDistance = Math.max(travelDistance, 1);
+    scrollDistance = animationDistance + getEndBuffer();
   }
 
   function getParallaxLeadIn() {
     return Math.min(100, Math.max(48, window.innerHeight * 0.08));
+  }
+
+  function prepareImage(index) {
+    const image = images[index];
+    if (!image) return;
+
+    image.loading = "eager";
+
+    if (typeof image.decode === "function") {
+      image.decode().catch(function () {
+        // Decoding is only a preparation step. A failed decode must not block
+        // scrolling or the regular browser image loading path.
+      });
+    }
   }
 
   function setActiveItem(index) {
@@ -93,13 +113,15 @@ document.addEventListener("DOMContentLoaded", function () {
       ease: "power1.out",
       overwrite: "auto"
     });
+
+    prepareImage(index + 1);
   }
 
   function getActiveIndexByTravel(currentTravel) {
     let activeIndex = 0;
 
-    titles.forEach((title, index) => {
-      if (currentTravel >= getTitleOffset(title) - 1) {
+    titleOffsets.forEach((titleOffset, index) => {
+      if (currentTravel >= titleOffset - 1) {
         activeIndex = index;
       }
     });
@@ -115,33 +137,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
   gsap.set(images, {
     yPercent: 0,
-    scale: prefersReducedMotion ? 1 : parallaxScale,
+    scale: useImageParallax ? parallaxScale : 1,
     transformOrigin: "center center"
   });
 
+  measureLayout();
+  prepareImage(1);
+
   const pinTween = gsap.to(list, {
-    y: () => -getTravelDistance(),
+    y: () => -travelDistance,
     ease: "none",
     scrollTrigger: {
       trigger: stage,
       start: () => `top top+=${getHeaderHeight()}`,
-      end: () => `+=${getScrollDistance()}`,
-      scrub: true,
+      end: () => `+=${scrollDistance}`,
+      scrub: hasTouchInput ? 0.15 : true,
       pin: stage,
       pinSpacing: true,
       anticipatePin: 1,
       invalidateOnRefresh: true,
       markers: false,
 
+      onRefreshInit: measureLayout,
       onRefresh: setPinSpacerBackground,
 
       onUpdate: function (self) {
         const animationProgress = Math.min(
-          self.progress * (getScrollDistance() / getAnimationDistance()),
+          self.progress * (scrollDistance / animationDistance),
           1
         );
 
-        const currentTravel = animationProgress * getTravelDistance();
+        const currentTravel = animationProgress * travelDistance;
         const activeIndex = getActiveIndexByTravel(currentTravel);
 
         setActiveItem(activeIndex);
@@ -149,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  const parallaxTween = prefersReducedMotion
+  const parallaxTween = !useImageParallax
     ? null
     : gsap.to(images, {
         yPercent: parallaxDistance,
