@@ -8,12 +8,30 @@ document.addEventListener("DOMContentLoaded", function () {
   const media = section.querySelector(".hero-scroll__media");
   const mediaInner = section.querySelector(".hero-scroll__media-inner");
   const nextSection = section.nextElementSibling;
+  const stage = section.closest("[data-hero-scroll-stage]");
   if (titles.length < 2 || images.length !== titles.length) return;
 
   let currentIndex = 0;
   let observer = null;
+  let followSectionHold = null;
   let backgroundPin = null;
   let parallaxTween = null;
+  let layoutMetrics = null;
+  let layoutWidth = 0;
+
+  function applyLayoutMetrics() {
+    const viewportHeight = Math.round(document.documentElement.clientHeight || window.innerHeight);
+    const headerHeight = Math.round(header ? header.getBoundingClientRect().height : 0);
+    const heroHeight = Math.max(1, Math.round(viewportHeight * 0.8 - headerHeight));
+
+    layoutMetrics = { viewportHeight, headerHeight, heroHeight };
+    layoutWidth = Math.round(document.documentElement.clientWidth || window.innerWidth);
+    section.style.minHeight = `${heroHeight}px`;
+    media.style.height = `${heroHeight}px`;
+    nextSection.style.top = `${heroHeight}px`;
+    nextSection.style.willChange = "transform";
+    stage.style.paddingBottom = `${viewportHeight}px`;
+  }
 
   function prepareImage(index) {
     const image = images[index];
@@ -87,28 +105,64 @@ document.addEventListener("DOMContentLoaded", function () {
   const ScrollTrigger = window.ScrollTrigger;
 
   function getHeroStart() {
-    const headerHeight = header ? header.getBoundingClientRect().height : 0;
-    return `top top+=${headerHeight}`;
+    return `top top+=${layoutMetrics.headerHeight}`;
   }
 
-  function getTransitionEnd() {
-    const headerHeight = header ? header.getBoundingClientRect().height : 0;
-    return `top top+=${headerHeight}`;
+  function getTitleFocusPosition() {
+    const isCompact = window.matchMedia("(max-width: 849.98px)").matches;
+    const focusPosition = Math.round(window.innerHeight * (isCompact ? 0.3 : 0.5));
+    return `top top+=${focusPosition}`;
   }
 
-  if (gsap && ScrollTrigger && media && mediaInner && nextSection) {
+  function getFollowHoldPosition() {
+    const visibleHeroBottom = layoutMetrics.heroHeight + layoutMetrics.headerHeight;
+    return `top top+=${visibleHeroBottom}`;
+  }
+
+  function getLayerTransitionDistance() {
+    return layoutMetrics.heroHeight;
+  }
+
+  if (gsap && ScrollTrigger && media && mediaInner && nextSection && stage) {
     gsap.registerPlugin(ScrollTrigger);
+    applyLayoutMetrics();
 
     document.body.classList.add("has-hero-background-pin");
+    gsap.set(nextSection, { y: 0, force3D: true });
+
+    followSectionHold = ScrollTrigger.create({
+      trigger: nextSection,
+      start: getFollowHoldPosition,
+      endTrigger: titles[titles.length - 1],
+      end: getTitleFocusPosition,
+      onUpdate: function (self) {
+        const travel = Math.max(0, self.end - self.start);
+        gsap.set(nextSection, {
+          y: self.progress * travel,
+          force3D: true
+        });
+      },
+      onRefresh: function (self) {
+        const travel = Math.max(0, self.end - self.start);
+        gsap.set(nextSection, {
+          y: self.progress * travel,
+          force3D: true
+        });
+      },
+      invalidateOnRefresh: true,
+      refreshPriority: 2
+    });
 
     backgroundPin = ScrollTrigger.create({
       trigger: section,
       start: getHeroStart,
-      endTrigger: nextSection,
-      end: getTransitionEnd,
+      end: function () {
+        return followSectionHold.end + getLayerTransitionDistance();
+      },
       pin: media,
       pinSpacing: false,
-      invalidateOnRefresh: true
+      invalidateOnRefresh: true,
+      refreshPriority: 1
     });
 
     if (!prefersReducedMotion) {
@@ -119,11 +173,16 @@ document.addEventListener("DOMContentLoaded", function () {
           yPercent: -5,
           ease: "none",
           scrollTrigger: {
-            trigger: nextSection,
-            start: "top bottom",
-            end: getTransitionEnd,
+            trigger: stage,
+            start: function () {
+              return followSectionHold.end;
+            },
+            end: function () {
+              return backgroundPin.end;
+            },
             scrub: 0.35,
-            invalidateOnRefresh: true
+            invalidateOnRefresh: true,
+            refreshPriority: 0
           }
         }
       );
@@ -133,8 +192,26 @@ document.addEventListener("DOMContentLoaded", function () {
   const breakpoint = window.matchMedia("(max-width: 849.98px)");
   const handleBreakpointChange = function () {
     createObserver();
-    if (ScrollTrigger) ScrollTrigger.refresh();
+    if (ScrollTrigger && media && nextSection && stage) {
+      applyLayoutMetrics();
+      ScrollTrigger.refresh();
+    }
   };
+
+  let resizeFrame = null;
+  const handleResize = function () {
+    const currentWidth = Math.round(document.documentElement.clientWidth || window.innerWidth);
+    if (Math.abs(currentWidth - layoutWidth) < 2) return;
+
+    if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
+    resizeFrame = window.requestAnimationFrame(function () {
+      applyLayoutMetrics();
+      if (ScrollTrigger) ScrollTrigger.refresh();
+      resizeFrame = null;
+    });
+  };
+
+  window.addEventListener("resize", handleResize, { passive: true });
 
   if (typeof breakpoint.addEventListener === "function") {
     breakpoint.addEventListener("change", handleBreakpointChange);
@@ -145,8 +222,12 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("beforeunload", function () {
     if (observer) observer.disconnect();
 
+    if (followSectionHold) followSectionHold.kill();
+
     if (backgroundPin) backgroundPin.kill();
     document.body.classList.remove("has-hero-background-pin");
+    window.removeEventListener("resize", handleResize);
+    if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
 
     if (parallaxTween && parallaxTween.scrollTrigger) {
       parallaxTween.scrollTrigger.kill();
