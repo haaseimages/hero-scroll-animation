@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const treatmentTitles = treatments
     ? treatments.querySelectorAll(".hero-scroll__title")
     : [];
-  const cue = section.querySelector("[data-hero-scroll-cue]");
+  const cue = document.querySelector("[data-hero-scroll-cue]");
   const nextSection = section.nextElementSibling;
   const gsap = window.gsap;
   const ScrollTrigger = window.ScrollTrigger;
@@ -59,10 +59,10 @@ document.addEventListener("DOMContentLoaded", function () {
         indent: 80
       } : false,
       onEnter: function () {
-        section.classList.add("is-hero-cue-hidden");
+        cue.classList.add("is-hidden");
       },
       onLeaveBack: function () {
-        section.classList.remove("is-hero-cue-hidden");
+        cue.classList.remove("is-hidden");
       },
       invalidateOnRefresh: true
     });
@@ -74,6 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.body.classList.remove("has-hero-intro-reveal");
     section.classList.remove("is-treatment-list-visible");
-    section.classList.remove("is-hero-cue-hidden");
+    if (cue) cue.classList.remove("is-hidden");
   });
 });

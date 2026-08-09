@@ -258,7 +258,7 @@ body {
   visibility: visible;
 }
 
-.has-hero-intro-reveal [data-hero-scroll].is-hero-cue-hidden .hero-scroll__cue {
+.hero-scroll__cue.is-hidden {
   visibility: hidden;
 }
 
@@ -274,7 +274,7 @@ body {
   margin-inline: auto;
   max-inline-size: calc(100% - 24px);
   pointer-events: none;
-  position: absolute;
+  position: fixed;
   text-align: center;
   bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   transform: translateZ(0);
