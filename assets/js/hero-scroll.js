@@ -14,13 +14,26 @@ document.addEventListener("DOMContentLoaded", function () {
   let backgroundPin = null;
 
   // Debug-Hilfen.
-  const showScrollMarkers = true;
+  const showScrollMarkers = false;
 
   function prepareImage(index) {
     const image = images[index];
     if (!image) return;
 
     image.loading = "eager";
+
+    const picture = image.closest("picture");
+    if (picture) {
+      picture.querySelectorAll("source[data-srcset]").forEach(function (source) {
+        source.srcset = source.dataset.srcset;
+        source.removeAttribute("data-srcset");
+      });
+    }
+
+    if (image.dataset.src) {
+      image.src = image.dataset.src;
+      image.removeAttribute("data-src");
+    }
 
     if (typeof image.decode === "function") {
       image.decode().catch(function () {
