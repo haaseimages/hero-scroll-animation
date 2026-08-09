@@ -49,9 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function getObserverMargin() {
-    return window.matchMedia("(max-width: 849.98px)").matches
-      ? "-25% 0px -65% 0px"
-      : "-45% 0px -45% 0px";
+    return "-23% 0px -73% 0px";
   }
 
   function createObserver() {

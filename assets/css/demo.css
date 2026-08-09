@@ -217,7 +217,7 @@ body {
   flex-direction: column;
   gap: clamp(4px, 1.2vh, 12px);
   position: relative;
-  padding-block-start: calc(50svh - var(--header-height));
+  padding-block-start: calc(25svh - var(--header-height));
   padding-block-end: 5svh;
 }
 
@@ -318,7 +318,6 @@ body {
     gap: clamp(4px, 0.8svh, 10px);
     inline-size: calc(100vw - 24px);
     max-inline-size: 100%;
-    padding-block-start: calc(30svh - var(--header-height));
     padding-block-end: 5svh;
   }
 
