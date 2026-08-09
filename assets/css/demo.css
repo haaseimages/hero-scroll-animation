@@ -45,13 +45,17 @@ html {
 
 html,
 body {
-  background: var(--surface);
+  background: var(--surface-dark);
   font-family: "Instrument Sans", sans-serif;
   max-width: 100%;
 }
 
+#smooth-wrapper,
 #smooth-content {
-  background-color: var(--surface);
+  background-color: var(--surface-dark);
+}
+
+#smooth-content {
   isolation: isolate;
   padding-top: var(--header-height);
   position: relative;
