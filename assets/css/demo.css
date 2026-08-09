@@ -151,9 +151,16 @@ body {
   min-height: calc(100svh - var(--header-height));
 }
 
-.hero-scroll-stage > [data-hero-scroll] + .section--light,
-.hero-scroll-pin-spacer {
+.hero-scroll-stage {
+  background-color: var(--surface-dark);
+}
+
+.hero-scroll-stage > [data-hero-scroll] + .section--light {
   background-color: var(--surface);
+}
+
+.hero-scroll-pin-spacer {
+  background-color: var(--surface-dark);
 }
 
 .hero-scroll-stage > [data-hero-scroll] + .section--test {
