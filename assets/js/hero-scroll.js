@@ -6,14 +6,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const images = Array.from(section.querySelectorAll(".hero-scroll__image"));
   const header = document.querySelector("[data-header]");
   const media = section.querySelector(".hero-scroll__media");
-  const mediaInner = section.querySelector(".hero-scroll__media-inner");
   const nextSection = section.nextElementSibling;
   if (titles.length < 2 || images.length !== titles.length) return;
 
   let currentIndex = 0;
   let observer = null;
   let backgroundPin = null;
-  let parallaxTween = null;
+
+  // Debug-Hilfen und Laenge des zusaetzlichen Pin-Bereichs.
+  const showScrollMarkers = true;
+  const endOffsetVh = 0;
 
   function prepareImage(index) {
     const image = images[index];
@@ -82,7 +84,6 @@ document.addEventListener("DOMContentLoaded", function () {
   prepareImage(1);
   createObserver();
 
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const gsap = window.gsap;
   const ScrollTrigger = window.ScrollTrigger;
 
@@ -93,10 +94,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function getTransitionEnd() {
     const headerHeight = header ? header.getBoundingClientRect().height : 0;
-    return `top top+=${headerHeight}`;
+    const endOffset = window.innerHeight * (endOffsetVh / 100);
+    return `top top+=${headerHeight + endOffset}`;
   }
 
-  if (gsap && ScrollTrigger && media && mediaInner && nextSection) {
+  if (gsap && ScrollTrigger && media && nextSection) {
     gsap.registerPlugin(ScrollTrigger);
 
     document.body.classList.add("has-hero-background-pin");
@@ -108,26 +110,9 @@ document.addEventListener("DOMContentLoaded", function () {
       end: getTransitionEnd,
       pin: media,
       pinSpacing: false,
+      markers: showScrollMarkers,
       invalidateOnRefresh: true
     });
-
-    if (!prefersReducedMotion) {
-      parallaxTween = gsap.fromTo(
-        mediaInner,
-        { yPercent: 5 },
-        {
-          yPercent: -5,
-          ease: "none",
-          scrollTrigger: {
-            trigger: nextSection,
-            start: "top bottom",
-            end: getTransitionEnd,
-            scrub: 0.35,
-            invalidateOnRefresh: true
-          }
-        }
-      );
-    }
   }
 
   const breakpoint = window.matchMedia("(max-width: 849.98px)");
@@ -147,12 +132,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (backgroundPin) backgroundPin.kill();
     document.body.classList.remove("has-hero-background-pin");
-
-    if (parallaxTween && parallaxTween.scrollTrigger) {
-      parallaxTween.scrollTrigger.kill();
-    }
-
-    if (parallaxTween) parallaxTween.kill();
 
     if (typeof breakpoint.removeEventListener === "function") {
       breakpoint.removeEventListener("change", handleBreakpointChange);

@@ -176,13 +176,11 @@ body {
 }
 
 .hero-scroll__media-inner {
-  height: 112%;
+  height: 100%;
   left: 0;
   position: absolute;
-  top: -6%;
-  transform-origin: center center;
+  top: 0;
   width: 100%;
-  will-change: transform;
 }
 
 .hero[data-hero-scroll] .hero-scroll__image {
@@ -218,8 +216,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: clamp(4px, 1.2vh, 12px);
-  padding-block: calc(50svh - var(--header-height)) calc(50svh - 0.75em);
   position: relative;
+  padding-block-start: calc(50svh - var(--header-height));
+  padding-block-end: 5svh;
 }
 
 .hero-scroll__title {
@@ -319,7 +318,8 @@ body {
     gap: clamp(4px, 0.8svh, 10px);
     inline-size: calc(100vw - 24px);
     max-inline-size: 100%;
-    padding-block: calc(30svh - var(--header-height)) 70svh;
+    padding-block-start: calc(15svh - var(--header-height));
+    padding-block-end: 5svh;
   }
 
   .hero-scroll__title {
@@ -342,7 +342,8 @@ body {
     gap: clamp(4px, 0.8svh, 10px);
     inline-size: calc(100vw - 24px);
     max-inline-size: 100%;
-    padding-block: calc(30svh - var(--header-height)) 70svh;
+    padding-block-start: calc(50svh - var(--header-height));
+    padding-block-end: 5svh;
   }
 
   .hero-scroll__title {
