@@ -310,6 +310,21 @@ body {
   inline-size: 48px;
 }
 
+.hero-scroll__cue:not(.is-hidden):not([hidden]) .hero-scroll__cue-icon {
+  animation: discovery-arrow-bounce 1.6s ease-in-out infinite;
+}
+
+@keyframes discovery-arrow-bounce {
+  0%,
+  100% {
+    transform: translate3d(0, -3px, 0);
+  }
+
+  50% {
+    transform: translate3d(0, 7px, 0);
+  }
+}
+
 .hero-scroll__title {
   color: var(--color-light-50);
   font-family: "Cabinet Grotesk", sans-serif;
@@ -446,6 +461,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-scroll__cue-icon {
+    animation: none;
+  }
+
   .hero-scroll__title {
     transition-duration: 0.01ms;
   }
