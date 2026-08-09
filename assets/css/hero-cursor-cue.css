@@ -1,0 +1,39 @@
+.hero-cursor-cue {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hero-cursor-cue {
+    align-items: center;
+    background: var(--color-light);
+    border-radius: 999px;
+    color: var(--color-dark);
+    display: flex;
+    gap: 7px;
+    inset: 0 auto auto 0;
+    opacity: 0;
+    padding: 9px 13px;
+    pointer-events: none;
+    position: fixed;
+    transform: translate3d(-100px, -100px, 0) scale(0.86);
+    visibility: hidden;
+    white-space: nowrap;
+    will-change: transform;
+    z-index: 501;
+  }
+
+  .hero-cursor-cue span {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .hero-cursor-cue img {
+    block-size: 18px;
+    display: block;
+    filter: brightness(0) saturate(100%) invert(15%) sepia(11%) saturate(1975%) hue-rotate(234deg) brightness(92%);
+    inline-size: 18px;
+  }
+}
