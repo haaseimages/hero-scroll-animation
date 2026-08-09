@@ -262,6 +262,16 @@ body {
   visibility: hidden;
 }
 
+.hero-scroll__cue-layer {
+  block-size: 100vh;
+  block-size: 100svh;
+  inset-block-start: 0;
+  inset-inline: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 499;
+}
+
 .hero-scroll__cue {
   align-items: center;
   backface-visibility: hidden;
@@ -274,7 +284,7 @@ body {
   margin-inline: auto;
   max-inline-size: calc(100% - 24px);
   pointer-events: none;
-  position: fixed;
+  position: absolute;
   text-align: center;
   bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   transform: translateZ(0);
