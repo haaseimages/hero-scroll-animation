@@ -163,6 +163,17 @@ body {
 .hero[data-hero-scroll] {
   background-color: var(--section-bg);
   min-height: calc(100svh - var(--header-height));
+  touch-action: pan-y pinch-zoom;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.hero[data-hero-scroll] img,
+.hero[data-hero-scroll] svg {
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .hero-scroll-stage {
