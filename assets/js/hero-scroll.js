@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function getTransitionEnd() {
     const headerHeight = header ? header.getBoundingClientRect().height : 0;
     const endOffset = window.innerHeight * (endOffsetVh / 100);
-    return `top top+=${headerHeight + endOffset}`;
+    return `bottom top+=${headerHeight + endOffset}`;
   }
 
   if (gsap && ScrollTrigger && media && nextSection) {
