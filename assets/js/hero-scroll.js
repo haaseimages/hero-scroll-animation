@@ -14,7 +14,60 @@ document.addEventListener("DOMContentLoaded", function () {
   let backgroundPin = null;
 
   // Debug-Hilfen.
-  const showScrollMarkers = false;
+  const showScrollMarkers = true;
+  const showTriggerMarkers = true;
+  let triggerMarkerLayer = null;
+
+  function createTriggerMarkers() {
+    if (!showTriggerMarkers) return;
+
+    const markers = [
+      { top: "30%", label: "ÜBERSCHRIFTEN · 30%", color: "#00e68a" },
+      { top: "50%", label: "BEHANDLUNGSLISTE · 50%", color: "#ffd166" }
+    ];
+
+    triggerMarkerLayer = document.createElement("div");
+    triggerMarkerLayer.setAttribute("aria-hidden", "true");
+    Object.assign(triggerMarkerLayer.style, {
+      inset: "0",
+      pointerEvents: "none",
+      position: "fixed",
+      zIndex: "1000"
+    });
+
+    markers.forEach(function (config) {
+      const marker = document.createElement("div");
+      const label = document.createElement("span");
+
+      label.textContent = config.label;
+      Object.assign(marker.style, {
+        borderTop: "2px solid " + config.color,
+        left: "0",
+        position: "absolute",
+        right: "0",
+        top: config.top
+      });
+      Object.assign(label.style, {
+        background: config.color,
+        color: "#16251f",
+        display: "block",
+        font: "700 10px/1 sans-serif",
+        letterSpacing: "0.08em",
+        marginLeft: "auto",
+        marginRight: "8px",
+        padding: "4px 6px",
+        transform: "translateY(-100%)",
+        width: "max-content"
+      });
+
+      marker.appendChild(label);
+      triggerMarkerLayer.appendChild(marker);
+    });
+
+    document.body.appendChild(triggerMarkerLayer);
+  }
+
+  createTriggerMarkers();
 
   function prepareImage(index) {
     const image = images[index];
@@ -61,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function getObserverMargin() {
-    return "-23% 0px -73% 0px";
+    return "-28% 0px -68% 0px";
   }
 
   function createObserver() {
@@ -140,6 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (backgroundPin) backgroundPin.kill();
     document.body.classList.remove("has-hero-background-pin");
+    if (triggerMarkerLayer) triggerMarkerLayer.remove();
 
     if (typeof breakpoint.removeEventListener === "function") {
       breakpoint.removeEventListener("change", handleBreakpointChange);

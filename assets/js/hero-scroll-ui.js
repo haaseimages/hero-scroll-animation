@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const showScrollMarkers = false;
 
   const intro = section.querySelector(".hero-scroll__intro");
+  const titleList = section.querySelector(".hero-scroll__list");
+  const brandLogo = section.querySelector(".hero-scroll__brand-logo");
   const treatments = section.querySelector(".hero-scroll__treatments");
   const treatmentTitles = treatments
     ? treatments.querySelectorAll(".hero-scroll__title")
@@ -26,17 +28,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let treatmentVisibilityTrigger = null;
   let cueVisibilityTrigger = null;
+  let logoResizeObserver = null;
+  let lastLogoCenterOffset = -1;
+
+  function updateLogoCenterOffset() {
+    if (!titleList || !brandLogo) return;
+
+    const logoCenterOffset = intro.getBoundingClientRect().height / 2;
+    if (Math.abs(logoCenterOffset - lastLogoCenterOffset) < 0.25) return;
+
+    lastLogoCenterOffset = logoCenterOffset;
+    titleList.style.setProperty(
+      "--hero-logo-center-offset",
+      logoCenterOffset + "px"
+    );
+
+    if (treatmentVisibilityTrigger || cueVisibilityTrigger) {
+      ScrollTrigger.refresh();
+    }
+  }
 
   gsap.registerPlugin(ScrollTrigger);
   document.body.classList.add("has-hero-intro-reveal");
+
+  updateLogoCenterOffset();
+
+  if (brandLogo && "ResizeObserver" in window) {
+    logoResizeObserver = new ResizeObserver(updateLogoCenterOffset);
+    logoResizeObserver.observe(intro);
+  }
 
   if (cue) {
     cue.hidden = !showDiscoveryCue;
   }
 
   treatmentVisibilityTrigger = ScrollTrigger.create({
-    trigger: intro,
-    start: "top 30%",
+    trigger: treatments,
+    start: "top 50%",
     onEnter: function () {
       section.classList.add("is-treatment-list-visible");
     },
@@ -71,6 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("beforeunload", function () {
     if (treatmentVisibilityTrigger) treatmentVisibilityTrigger.kill();
     if (cueVisibilityTrigger) cueVisibilityTrigger.kill();
+    if (logoResizeObserver) logoResizeObserver.disconnect();
 
     document.body.classList.remove("has-hero-intro-reveal");
     section.classList.remove("is-treatment-list-visible");

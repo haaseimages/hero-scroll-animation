@@ -39,6 +39,16 @@
   padding: 0;
 }
 
+.visually-hidden {
+  block-size: 1px;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
 html {
   overflow-y: scroll;
 }
@@ -232,20 +242,31 @@ body {
 }
 
 .hero-scroll__list {
-  --hero-title-gap: clamp(4px, 1.2vh, 12px);
+  --hero-logo-center-offset: 0px;
+  --hero-title-gap: clamp(1.2rem, 2.9vw, 2.8rem);
 
   display: flex;
   flex-direction: column;
   gap: var(--hero-title-gap);
-  padding-block-start: calc(50svh - var(--header-height));
+  padding-block-start: calc(50svh - var(--header-height) - var(--hero-logo-center-offset));
   padding-block-end: 5svh;
   position: relative;
+}
+
+.hero-scroll__intro {
+  padding-block: clamp(10px, 1.5vw, 20px);
 }
 
 .hero-scroll__treatments {
   display: flex;
   flex-direction: column;
   gap: var(--hero-title-gap);
+}
+
+.hero-scroll__treatments .hero-scroll__title {
+  line-height: 1;
+  text-box-edge: cap alphabetic;
+  text-box-trim: trim-both;
 }
 
 .has-hero-intro-reveal .hero-scroll__treatments .hero-scroll__title {
@@ -259,7 +280,9 @@ body {
 }
 
 .hero-scroll__cue.is-hidden {
+  opacity: 0;
   visibility: hidden;
+  transition-delay: 0s, 450ms;
 }
 
 .hero-scroll__cue-layer {
@@ -288,6 +311,8 @@ body {
   text-align: center;
   bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   transform: translateZ(0);
+  opacity: 1;
+  transition: opacity 450ms ease, visibility 0s linear 0s;
   white-space: nowrap;
   z-index: 3;
 }
@@ -339,6 +364,19 @@ body {
 .hero-scroll__title.is-active {
   color: var(--color-light);
   opacity: 1;
+}
+
+.hero-scroll__brand-title {
+  inline-size: 50vw;
+  line-height: 1;
+}
+
+.hero-scroll__brand-logo {
+  aspect-ratio: 600 / 214;
+  block-size: auto;
+  color: inherit;
+  display: block;
+  inline-size: 100%;
 }
 
 .content-section {
@@ -426,7 +464,7 @@ body {
   }
 
   .hero-scroll__list {
-    --hero-title-gap: clamp(4px, 0.8svh, 10px);
+    --hero-title-gap: clamp(6px, 1.2svh, 14px);
 
     inline-size: calc(100vw - 24px);
     max-inline-size: 100%;
@@ -441,6 +479,10 @@ body {
     overflow-wrap: normal;
     white-space: normal;
     word-break: normal;
+  }
+
+  .hero-scroll__brand-title {
+    inline-size: calc(100vw - 24px);
   }
 }
 
@@ -457,6 +499,10 @@ body {
     overflow-wrap: normal;
     white-space: normal;
     word-break: normal;
+  }
+
+  .hero-scroll__brand-title {
+    inline-size: calc(100vw - 24px);
   }
 }
 
