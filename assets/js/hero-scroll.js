@@ -13,9 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let observer = null;
   let backgroundPin = null;
 
-  // Debug-Hilfen und Laenge des zusaetzlichen Pin-Bereichs.
+  // Debug-Hilfen.
   const showScrollMarkers = true;
-  const endOffsetVh = 0;
 
   function prepareImage(index) {
     const image = images[index];
@@ -91,9 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function getTransitionEnd() {
-    const headerHeight = header ? header.getBoundingClientRect().height : 0;
-    const endOffset = window.innerHeight * (endOffsetVh / 100);
-    return `bottom top+=${headerHeight + endOffset}`;
+    return "bottom bottom";
   }
 
   if (gsap && ScrollTrigger && media && nextSection) {

@@ -159,12 +159,9 @@ body {
   background-color: var(--surface-dark);
 }
 
-.hero-scroll-stage > [data-hero-scroll] + .section--light {
-  background-color: var(--surface);
-}
-
+.hero-scroll-stage > [data-hero-scroll] + .section--light,
 .hero-scroll-pin-spacer {
-  background-color: var(--surface-dark);
+  background-color: var(--surface);
 }
 
 .hero-scroll-stage > [data-hero-scroll] + .section--test {
