@@ -1,3 +1,12 @@
+// Zentrale Hero-Trigger-Konfiguration. Positionswerte entsprechen Viewport-Prozent.
+window.skinArtHeroScrollConfig = Object.assign({
+  titleTriggerPosition: 40,
+  titleTriggerAreaHeight: 4,
+  treatmentListTriggerPosition: 50,
+  showTriggerMarkers: false,
+  showPinMarkers: false
+}, window.skinArtHeroScrollConfig || {});
+
 document.addEventListener("DOMContentLoaded", function () {
   const section = document.querySelector("[data-hero-scroll]");
   if (!section) return;
@@ -12,18 +21,24 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentIndex = 0;
   let observer = null;
   let backgroundPin = null;
+  const config = window.skinArtHeroScrollConfig;
 
-  // Debug-Hilfen.
-  const showScrollMarkers = true;
-  const showTriggerMarkers = true;
   let triggerMarkerLayer = null;
 
   function createTriggerMarkers() {
-    if (!showTriggerMarkers) return;
+    if (!config.showTriggerMarkers) return;
 
     const markers = [
-      { top: "30%", label: "ÜBERSCHRIFTEN · 30%", color: "#00e68a" },
-      { top: "50%", label: "BEHANDLUNGSLISTE · 50%", color: "#ffd166" }
+      {
+        top: config.titleTriggerPosition + "%",
+        label: "ÜBERSCHRIFTEN · " + config.titleTriggerPosition + "%",
+        color: "#00e68a"
+      },
+      {
+        top: config.treatmentListTriggerPosition + "%",
+        label: "BEHANDLUNGSLISTE · " + config.treatmentListTriggerPosition + "%",
+        color: "#ffd166"
+      }
     ];
 
     triggerMarkerLayer = document.createElement("div");
@@ -114,7 +129,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function getObserverMargin() {
-    return "-28% 0px -68% 0px";
+    const halfArea = config.titleTriggerAreaHeight / 2;
+    const topMargin = config.titleTriggerPosition - halfArea;
+    const bottomMargin = 100 - config.titleTriggerPosition - halfArea;
+
+    return `-${topMargin}% 0px -${bottomMargin}% 0px`;
   }
 
   function createObserver() {
@@ -171,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
       end: getTransitionEnd,
       pin: media,
       pinSpacing: false,
-      markers: showScrollMarkers,
+      markers: config.showPinMarkers,
       invalidateOnRefresh: true
     });
   }

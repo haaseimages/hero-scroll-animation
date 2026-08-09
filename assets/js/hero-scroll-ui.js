@@ -17,6 +17,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const nextSection = section.nextElementSibling;
   const gsap = window.gsap;
   const ScrollTrigger = window.ScrollTrigger;
+  const heroScrollConfig = window.skinArtHeroScrollConfig || {
+    treatmentListTriggerPosition: 50
+  };
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
 
   if (
     !intro ||
@@ -27,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ) return;
 
   let treatmentVisibilityTrigger = null;
+  let treatmentRevealTimeline = null;
   let cueVisibilityTrigger = null;
   let logoResizeObserver = null;
   let lastLogoCenterOffset = -1;
@@ -49,7 +56,25 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   gsap.registerPlugin(ScrollTrigger);
-  document.body.classList.add("has-hero-intro-reveal");
+
+  gsap.set(treatmentTitles, {
+    autoAlpha: 0,
+    y: prefersReducedMotion ? 0 : -12
+  });
+
+  treatmentRevealTimeline = gsap.timeline({
+    paused: true,
+    defaults: {
+      ease: "power2.out"
+    }
+  });
+
+  treatmentRevealTimeline.to(treatmentTitles, {
+    autoAlpha: 1,
+    y: 0,
+    duration: prefersReducedMotion ? 0.01 : 0.45,
+    stagger: prefersReducedMotion ? 0 : 0.10
+  });
 
   updateLogoCenterOffset();
 
@@ -63,14 +88,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   treatmentVisibilityTrigger = ScrollTrigger.create({
+    animation: treatmentRevealTimeline,
     trigger: treatments,
-    start: "top 50%",
-    onEnter: function () {
-      section.classList.add("is-treatment-list-visible");
-    },
-    onLeaveBack: function () {
-      section.classList.remove("is-treatment-list-visible");
-    },
+    start: "top " + heroScrollConfig.treatmentListTriggerPosition + "%",
+    toggleActions: "play none none reverse",
     invalidateOnRefresh: true
   });
 
@@ -98,11 +119,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.addEventListener("beforeunload", function () {
     if (treatmentVisibilityTrigger) treatmentVisibilityTrigger.kill();
+    if (treatmentRevealTimeline) treatmentRevealTimeline.kill();
     if (cueVisibilityTrigger) cueVisibilityTrigger.kill();
     if (logoResizeObserver) logoResizeObserver.disconnect();
 
-    document.body.classList.remove("has-hero-intro-reveal");
-    section.classList.remove("is-treatment-list-visible");
+    gsap.set(treatmentTitles, { clearProps: "opacity,transform,visibility" });
     if (cue) cue.classList.remove("is-hidden");
   });
 });

@@ -249,7 +249,7 @@ body {
   flex-direction: column;
   gap: var(--hero-title-gap);
   padding-block-start: calc(50svh - var(--header-height) - var(--hero-logo-center-offset));
-  padding-block-end: 5svh;
+  padding-block-end: 10svh;
   position: relative;
 }
 
@@ -267,16 +267,6 @@ body {
   line-height: 1;
   text-box-edge: cap alphabetic;
   text-box-trim: trim-both;
-}
-
-.has-hero-intro-reveal .hero-scroll__treatments .hero-scroll__title {
-  clip-path: inset(0 0 100% 0);
-  visibility: hidden;
-}
-
-.has-hero-intro-reveal [data-hero-scroll].is-treatment-list-visible .hero-scroll__treatments .hero-scroll__title {
-  clip-path: none;
-  visibility: visible;
 }
 
 .hero-scroll__cue.is-hidden {
